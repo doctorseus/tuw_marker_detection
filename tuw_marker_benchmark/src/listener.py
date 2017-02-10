@@ -25,7 +25,7 @@ class BenchmarkNode:
 
         #t = self.tfb.getLatestCommonTime("/p3dx/camera", "/p3dx/odom")
         try:
-            tf = self.tfb.lookup_transform("p3dx/camera", "p3dx/odom", rospy.Time(0))
+            tf = self.tfb.lookup_transform("p3dx/odom", "p3dx/camera", rospy.Time(0))
             rospy.loginfo('%s', tf)
 
             # http://wiki.ros.org/rviz/Tutorials/Markers%3A%20Points%20and%20Lines
@@ -43,24 +43,31 @@ class BenchmarkNode:
             points.type = Marker.POINTS
 
             # POINTS markers use x and y scale for width/height respectively
-            points.scale.x = 0.2
-            points.scale.y = 0.2
+            points.scale.x = 0.1
+            points.scale.y = 0.1
 
             # Points are green
             points.color.g = 1.0
             points.color.a = 1.0
 
+            '''
             f = 0.0
             for i in range(0, 100):
-                y = 5 * math.sin(f + i / 100.0 * 2 * math.pi)
-                z = 5 * math.cos(f + i / 100.0 * 2 * math.pi)
+                x = 5 * math.sin(f + i / 100.0 * 2 * math.pi)
+                y = 5 * math.cos(f + i / 100.0 * 2 * math.pi)
 
                 p = Point()
-                p.x = i - 50
+                p.x = x
                 p.y = y
-                p.z = z
+                p.z = 0
 
                 points.points.append(p)
+            '''
+            p = Point()
+            p.x = tf.transform.translation.x
+            p.y = tf.transform.translation.y
+            p.z = 0
+            points.points.append(p)
 
             self.vizPub.publish(points)
         except Exception as e:
