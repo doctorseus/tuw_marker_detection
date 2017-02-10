@@ -1,0 +1,29 @@
+<launch>
+
+    <node name="republish" type="republish" pkg="image_transport" output="screen" args="compressed in:=/p3dx/camera/image_raw raw out:=/p3dx/camera/image_raw_uncompressed" />
+
+    <node pkg="tuw_marker_playground" type="mpg_dice_node" name="mpgDice" output="screen">
+        <remap from="image" to="/p3dx/camera/image_raw_uncompressed"/>
+        <remap from="camera_info" to="/p3dx/camera/camera_info"/>
+        <remap from="fiducials" to="/mpgDiceFiducials"/>
+    </node>
+
+    <node pkg="tuw_aruco" type="aruco_node" name="arMarkerAruco" output="screen">
+        <param name="marker_size" value="0.06"/>
+        <param name="pose_estimation_enabled" value="false"/>
+        <param name="publish_markers" value="false"/>
+        <param name="publish_fiducials" value="true"/>
+
+        <remap from="image" to="/p3dx/camera/image_raw_uncompressed"/>
+        <remap from="camera_info" to="/p3dx/camera/camera_info"/>
+        <remap from="markers" to="/markersAruco"/>
+        <remap from="fiducials" to="/fiducialsAruco"/>
+    </node>
+
+    <node pkg="tuw_marker_pose_estimation" type="pose_estimation_node" name="arPoseEstimation" output="screen">
+        <remap from="fiducials" to="/fiducialsAruco"/>
+        <remap from="markers" to="/markersPoseEstimation"/>
+    </node>
+
+</launch>
+
