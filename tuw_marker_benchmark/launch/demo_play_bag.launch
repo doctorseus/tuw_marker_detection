@@ -1,0 +1,18 @@
+<launch>
+
+  <arg name="mapfile" default="$(find tuw_marker_benchmark)/map/bag_testmap.json" />
+  <arg name="markerMap" default="/markerMap" />
+
+  <param name="use_sim_time" value="true"/>
+  <node pkg="rosbag" type="play" name="player" output="screen" args="--loop --clock --rate 1.0 /home/privacy/Documents/ros/bags/marker_stripped.bag"/>
+
+  <node pkg="tuw_marker_server" type="tuw_marker_server.py" name="tuw_marker_server">
+      <param name="mapfile" value="$(arg mapfile)" />
+      <param name="frame_id" value="/p3dx/odom" />
+      <remap from="map" to="$(arg markerMap)" />
+  </node>
+
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find tuw_marker_benchmark)/rviz/demo_bag_config.rviz" />
+
+</launch>
+
