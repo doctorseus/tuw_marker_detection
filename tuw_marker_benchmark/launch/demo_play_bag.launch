@@ -1,18 +1,47 @@
 <launch>
 
-  <arg name="mapfile" default="$(find tuw_marker_benchmark)/map/bag_testmap.json" />
-  <arg name="markerMap" default="/markerMap" />
+    <arg name="mapfile" default="$(find tuw_marker_benchmark)/map/bag_testmap.json" />
 
-  <param name="use_sim_time" value="true"/>
-  <node pkg="rosbag" type="play" name="player" output="screen" args="--loop --clock --rate 1.0 /home/privacy/Documents/ros/bags/marker_stripped.bag"/>
+    <!-- ROS bag -->
+    <param name="use_sim_time" value="true"/>
+    <node pkg="rosbag" type="play" name="player" args="--loop --clock --rate 1.0 /home/privacy/Documents/ros/bags/marker_stripped.bag"/>
 
-  <node pkg="tuw_marker_server" type="tuw_marker_server.py" name="tuw_marker_server">
-      <param name="mapfile" value="$(arg mapfile)" />
-      <param name="frame_id" value="/p3dx/odom" />
-      <remap from="map" to="$(arg markerMap)" />
-  </node>
+    <!-- Marker map server -->
+    <node pkg="tuw_marker_server" type="tuw_marker_server.py" name="tuw_marker_server">
+        <param name="mapfile" value="$(arg mapfile)" />
+        <param name="frame_id" value="/p3dx/odom" />
+        <remap from="map" to="/markerMap" />
+    </node>
 
-  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find tuw_marker_benchmark)/rviz/demo_bag_config.rviz" />
+    <!-- Marker dedection -->
+    <node name="republish" type="republish" pkg="image_transport" output="screen" args="compressed in:=/p3dx/camera/image_raw raw out:=/p3dx/camera/image_raw_uncompressed" />
+
+    <node pkg="tuw_aruco" type="aruco_node" name="arMarkerAruco" output="screen">
+        <param name="show_debug_image" value="false"/>
+
+        <param name="marker_size" value="0.10"/>
+        <param name="pose_estimation_enabled" value="false"/>
+        <param name="publish_markers" value="false"/>
+        <param name="publish_fiducials" value="true"/>
+
+        <remap from="image" to="/p3dx/camera/image_raw_uncompressed"/>
+        <remap from="camera_info" to="/p3dx/camera/camera_info"/>
+        <remap from="markers" to="/markersAruco"/>
+        <remap from="fiducials" to="/fiducialsAruco"/>
+    </node>
+
+    <node pkg="tuw_marker_pose_estimation" type="pose_estimation_node" name="arPoseEstimation" output="screen">
+        <remap from="fiducials" to="/fiducialsAruco"/>
+        <remap from="markers" to="/markersDedected"/>
+    </node>
+
+    <!-- Benchmark node -->
+    <node pkg="tuw_marker_benchmark" type="run_benchmark.py" name="tuw_marker_benchmark" output="screen">
+        <remap from="map" to="/markerMap" />
+    </node>
+
+    <!-- RViz -->
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find tuw_marker_benchmark)/rviz/demo_bag_config.rviz" />
 
 </launch>
 
