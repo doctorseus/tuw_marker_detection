@@ -23,6 +23,8 @@ class Benchmark:
                 if map_marker is None:
                     print('Marker could not be matched to any map marker.')
 
+                print('%d == %d' % (detected_marker.id, map_marker.id))
+
     def match_marker(self, detected_marker):
         # TODO: Implement id matcher
 
@@ -34,7 +36,7 @@ class Benchmark:
 
         print('dist=%f, idx=%d' % (dist, idx))
 
-        return None
+        return self.bmap.markers[idx]
 
     def store_results(self):
         pass

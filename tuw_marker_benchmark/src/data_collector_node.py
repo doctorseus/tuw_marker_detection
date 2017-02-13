@@ -2,12 +2,60 @@
 import rospy
 import os
 import json
-from tf2_ros import TransformListener, Buffer
-from tf2_msgs.msg import TFMessage
+from tf2_ros import Buffer, TransformListener, TFMessage
+import tf2_geometry_msgs
+from geometry_msgs.msg import PoseStamped
 from tuw_marker_benchmark.srv import StoreData, ClearData
 from marker_msgs.msg import MarkerWithCovarianceArray
 from marker_msgs.msg import MarkerDetection
-from models import BMap, BMarkerDetection
+from models import BMap, BMarkerDetection, BPose
+
+from visualization_msgs.msg import Marker as VisualMarker
+from geometry_msgs.msg import Point
+
+
+class VisualHelper:
+
+    @staticmethod
+    def createVisualMarker(frame, namespace, id, scale, (r, g, b, a)):
+        marker = VisualMarker()
+        marker.header.frame_id = frame
+        marker.header.stamp = rospy.Time.now()
+        marker.ns = namespace
+        marker.action = VisualMarker.ADD
+
+        marker.pose.orientation.w = 1.0
+        marker.id = id
+
+        marker.scale.x = scale
+        marker.scale.y = scale
+
+        marker.color.r = r
+        marker.color.g = g
+        marker.color.b = b
+        marker.color.a = a
+        return marker
+
+    @staticmethod
+    def createPoints(frame, namespace, id, scale, color):
+        marker = VisualHelper.createVisualMarker(frame, namespace, id, scale, color)
+        marker.type = VisualMarker.POINTS
+        return marker
+
+
+def transform_bpose(tfb, bpose, frame_id, target_frame):
+    p = PoseStamped()
+    p.header.stamp = rospy.Time(0)
+    p.header.frame_id = frame_id
+    p.pose.position.x = bpose.position[0]
+    p.pose.position.y = bpose.position[1]
+    p.pose.position.z = bpose.position[2]
+    p.pose.orientation.x = bpose.orientation[0]
+    p.pose.orientation.y = bpose.orientation[1]
+    p.pose.orientation.z = bpose.orientation[2]
+    p.pose.orientation.w = bpose.orientation[3]
+    tp = tfb.transform(p, target_frame)
+    return BPose.from_Pose_msg(tp.pose)
 
 
 class DataCollectorNode:
@@ -25,6 +73,8 @@ class DataCollectorNode:
 
         rospy.Service(rospy.get_name() + '/store_data', StoreData, self.store_data_callback)
         rospy.Service(rospy.get_name() + '/clear_data', ClearData, self.clear_data_callback)
+
+        self.vizPub = rospy.Publisher("benchmark_visualization", VisualMarker, queue_size=10)
 
     def clear_data_callback(self, req):
         count = len(self.marker_detections)
@@ -45,7 +95,33 @@ class DataCollectorNode:
         self.map = BMap.from_MarkerWithCovarianceArray_msg(msg)
 
     def marker_detection_callback(self, msg):
-        self.marker_detections.append(BMarkerDetection.from_MarkerDetection_msg(msg))
+        # Marker are detected relative to camera position. Convert positions to absolute values.
+        bmarker_detection = BMarkerDetection.from_MarkerDetection_msg(msg)
+
+        for marker in bmarker_detection.markers:
+            marker.pose = transform_bpose(self.tfb, marker.pose, 'p3dx/camera', 'p3dx/odom')
+
+        self.marker_detections.append(bmarker_detection)
+
+        ### FOR DEBUG PURPOSES ###
+        # Show absolute 2D position of camera and detected markers via visualization msgs
+        camera_tf = self.tfb.lookup_transform("p3dx/odom", "p3dx/camera", rospy.Time(0))
+
+        vizmarker = VisualHelper.createPoints("p3dx/odom", "camera", 1, 0.2, (1, 0, 0, 1))
+        p = Point()
+        p.x = camera_tf.transform.translation.x
+        p.y = camera_tf.transform.translation.y
+        p.z = 0
+        vizmarker.points.append(p)
+
+        for marker in bmarker_detection.markers:
+            p = Point()
+            p.x = marker.pose.position[0]
+            p.y = marker.pose.position[1]
+            p.z = 0
+            vizmarker.points.append(p)
+
+        self.vizPub.publish(vizmarker)
 
     @staticmethod
     def store_data(directory, bmap, bmarker_detections):
