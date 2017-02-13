@@ -1,6 +1,3 @@
-import re
-
-
 class BMap:
 
     def __init__(self, markers):
@@ -16,6 +13,10 @@ class BMap:
     @staticmethod
     def to_json(map_obj):
         return map(BMarker.to_json, map_obj.markers)
+
+    @staticmethod
+    def from_json(obj):
+        return BMap(map(BMarker.from_json, obj))
 
 
 class BMarker:
@@ -40,6 +41,10 @@ class BMarker:
             'pose': BPose.to_json(marker_detection_obj.pose)
         }
 
+    @staticmethod
+    def from_json(obj):
+        return BMarker(obj['id'], BPose.from_json(obj['pose']))
+
 class BPose:
 
     def __init__(self, position, orientation):
@@ -47,7 +52,7 @@ class BPose:
         self.orientation = orientation
 
     def __str__(self):
-        return 'BPose[]'
+        return 'BPose[position=%s, orientation=%s]' % (self.position, self.orientation)
 
     @staticmethod
     def from_Pose_msg(msg):
@@ -61,6 +66,10 @@ class BPose:
             'position': pose_obj.position,
             'orientation': pose_obj.orientation
         }
+
+    @staticmethod
+    def from_json(obj):
+        return BPose(obj['position'], obj['orientation'])
 
 
 class BMarkerDetection:
@@ -87,3 +96,7 @@ class BMarkerDetection:
             'header': marker_detection_obj.header,
             'markers': map(BMarker.to_json, marker_detection_obj.markers)
         }
+
+    @staticmethod
+    def from_json(obj):
+        return BMarkerDetection(obj['header'], map(BMarker.from_json, obj['markers']))
