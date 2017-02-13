@@ -36,7 +36,7 @@
     </node>
 
     <!-- Benchmark node -->
-    <node pkg="tuw_marker_benchmark" type="run_benchmark.py" name="tuw_marker_benchmark" output="screen">
+    <node pkg="tuw_marker_benchmark" type="data_collector_node.py" name="tuw_marker_benchmark" output="screen">
         <remap from="map" to="/markerMap" />
         <remap from="markerDetection" to="/markerDetection" />
     </node>

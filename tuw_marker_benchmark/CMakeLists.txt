@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(tuw_marker_benchmark)
 
 ## Find catkin macros and libraries
-find_package(catkin REQUIRED
+find_package(catkin REQUIRED COMPONENTS
     roscpp
     rospy
     std_msgs
@@ -12,10 +12,21 @@ find_package(catkin REQUIRED
     cv_bridge
     marker_msgs
     dynamic_reconfigure
+    message_generation
+)
+
+add_service_files(
+  FILES
+  StoreData.srv
+  ClearData.srv
+)
+
+generate_messages(
+  DEPENDENCIES
+  std_msgs
 )
 
 ## The catkin_package macro generates cmake config files for your package
 catkin_package(
     DEPENDS dynamic_reconfigure roscpp rospy std_msgs
 )
-

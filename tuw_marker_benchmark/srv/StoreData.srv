@@ -1,0 +1,4 @@
+string directory_path # File used to store collected data
+---
+bool success   # indicate successful run of service
+string message # informational, e.g. for error messages
