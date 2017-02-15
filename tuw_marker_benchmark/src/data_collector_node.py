@@ -3,7 +3,7 @@ import rospy
 import os
 import json
 from tf2_ros import Buffer, TransformListener, TFMessage
-import tf2_geometry_msgs
+from tf2_geometry_msgs import *
 from geometry_msgs.msg import PoseStamped
 from tuw_marker_benchmark.srv import StoreData, ClearData
 from marker_msgs.msg import MarkerWithCovarianceArray
@@ -95,6 +95,14 @@ class DataCollectorNode:
         self.map = BMap.from_MarkerWithCovarianceArray_msg(msg)
 
     def marker_detection_callback(self, msg):
+        # Test if TF lookup is available withing timeout frame
+        try:
+            timeout = 1.0
+            self.tfb.lookup_transform('p3dx/camera', 'p3dx/odom', rospy.Time(0), rospy.Duration(timeout))
+        except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException) as e:
+            rospy.logerr('TF lookup (\'p3dx/camera\', \'p3dx/odom\') failed after waiting for %d seconds. Skipping marker detection frame. TF publish to slow?', timeout)
+            return
+
         # Marker are detected relative to camera position. Convert positions to absolute values.
         bmarker_detection = BMarkerDetection.from_MarkerDetection_msg(msg)
 
