@@ -19,6 +19,11 @@ find_package(catkin REQUIRED
 ## System dependencies
 find_package( OpenCV REQUIRED )
 
+## Generate dynamic reconfigure parameters
+generate_dynamic_reconfigure_options(
+        cfg/Dice.cfg
+)
+
 ## The catkin_package macro generates cmake config files for your package
 catkin_package(
     DEPENDS OpenCV

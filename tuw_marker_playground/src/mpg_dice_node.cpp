@@ -31,9 +31,6 @@
 
 #include "mpg_dice_node.h"
 
-bool show_debug_image = true;
-float marker_point_offset = 0.0353f;
-
 int main(int argc, char **argv) {
     ros::init(argc, argv, "mpgDiceMarker");
     ros::NodeHandle n;
@@ -44,14 +41,18 @@ int main(int argc, char **argv) {
 
 MPGDiceNode::MPGDiceNode(ros::NodeHandle &n) : n_(n), imageTransport_(n) {
 
+    // Register dynamic_reconfigure callback
+    configCallbackFnct_ = boost::bind(&MPGDiceNode::configCallback, this ,  _1, _2);
+    configServer_.setCallback(configCallbackFnct_);
+
     // Advert fiducial publisher
     pub_fiducials_ = n_.advertise<marker_msgs::FiducialDetection>("fiducials", 10);
 
     // Subscribe to image topic
     cameraSubscriber_ = imageTransport_.subscribeCamera("image", 1, &MPGDiceNode::imageCallback, this);
     
-    if(show_debug_image){
-        cv::namedWindow("mpg_node_debug", CV_WINDOW_NORMAL | CV_GUI_NORMAL);
+    if(config_.show_debug_image){
+        cv::namedWindow("mpg_dice_debug", CV_WINDOW_NORMAL | CV_GUI_NORMAL);
     }
 
 }
@@ -68,7 +69,7 @@ void MPGDiceNode::publishFiducials(const std_msgs::Header &header, std::vector<M
         marker_msgs::Fiducial fiducial;
 
         // Add all object points
-        for (auto &cvp: marker.get3DPoints(marker_point_offset)) {
+        for (auto &cvp: marker.get3DPoints(config_.marker_dot_displacement)) {
             geometry_msgs::Point point;
             point.x = cvp.x;
             point.y = cvp.y;
@@ -206,10 +207,11 @@ void MPGDiceNode::imageCallback(const sensor_msgs::ImageConstPtr &image_msg, con
 
 
         // Publish fiducials
-        publishFiducials(image_msg->header, markers, camer_info_);
+        if(config_.publish_fiducials)
+            publishFiducials(image_msg->header, markers, camer_info_);
 
         // Draw markers if debug image is enabled
-        if(show_debug_image){
+        if(config_.show_debug_image){
             cv::Mat debugImage;
             cvtColor(image, debugImage, cv::COLOR_GRAY2BGR);
 
@@ -294,8 +296,7 @@ void MPGDiceNode::imageCallback(const sensor_msgs::ImageConstPtr &image_msg, con
             }
             */
 
-
-            cv::imshow("mpg_node_debug", debugImage);
+            cv::imshow("mpg_dice_debug", debugImage);
             cv::waitKey(5);
         }
     } catch (cv_bridge::Exception &e) {
@@ -304,6 +305,11 @@ void MPGDiceNode::imageCallback(const sensor_msgs::ImageConstPtr &image_msg, con
     }
 }
 
+void MPGDiceNode::configCallback(tuw_marker_playground::DiceConfig &config, uint32_t level) {
+    config_.show_debug_image = config.show_debug_image;
+    config_.marker_dot_displacement = config.marker_dot_displacement;
+    config_.publish_fiducials = config.publish_fiducials;
+}
 
 struct ComparePoints
 {
@@ -351,9 +357,9 @@ MPGDiceMarker::~MPGDiceMarker() {}
 
 std::vector<cv::Point3f> MPGDiceMarker::get3DPoints(float offset) {
     std::vector<cv::Point3f> objectPoints;
-    objectPoints.push_back(cv::Point3f(offset, 0.0f, 0.0f));
-    objectPoints.push_back(cv::Point3f(0.00f, offset, 0.0f));
-    objectPoints.push_back(cv::Point3f(-offset, 0.0f, 0.0f));
-    objectPoints.push_back(cv::Point3f(0.00f, -offset, 0.0f));
+    objectPoints.push_back(cv::Point3f(-offset, offset, 0.0f));
+    objectPoints.push_back(cv::Point3f(offset, offset, 0.0f));
+    objectPoints.push_back(cv::Point3f(offset, -offset, 0.0f));
+    objectPoints.push_back(cv::Point3f(-offset,-offset, 0.0f));
     return objectPoints;
 }

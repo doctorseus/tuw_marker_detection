@@ -39,6 +39,9 @@
 #include <marker_msgs/MarkerDetection.h>
 #include <marker_msgs/FiducialDetection.h>
 
+#include <dynamic_reconfigure/server.h>
+#include <tuw_marker_playground/DiceConfig.h>
+
 #include <cv_bridge/cv_bridge.h>
 #include <opencv2/core/core.hpp>
 #include "opencv2/highgui/highgui.hpp"
@@ -61,8 +64,10 @@ public:
 class MPGDiceNode {
 public:
     MPGDiceNode(ros::NodeHandle &n);
-
     ~MPGDiceNode();
+
+    dynamic_reconfigure::Server<tuw_marker_playground::DiceConfig> configServer_;
+    dynamic_reconfigure::Server<tuw_marker_playground::DiceConfig>::CallbackType configCallbackFnct_;
 
 private:
     ros::NodeHandle n_;
@@ -72,10 +77,17 @@ private:
 
     ros::Publisher pub_fiducials_;
 
+    struct {
+        bool show_debug_image = true;
+        double marker_dot_displacement = 0.05;
+        bool publish_fiducials = true;
+    } config_;
+
     void imageCallback(const sensor_msgs::ImageConstPtr &image_msg, const sensor_msgs::CameraInfoConstPtr &camer_info_);
 
     void publishFiducials(const std_msgs::Header &header, std::vector<MPGDiceMarker> &markers, const sensor_msgs::CameraInfoConstPtr &camer_info_);
 
+    void configCallback(tuw_marker_playground::DiceConfig &config, uint32_t level);
 };
 
 #endif // TUW_MPG_DICE_NODE_H
