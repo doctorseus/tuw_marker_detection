@@ -77,11 +77,8 @@ private:
 
     ros::Publisher pub_fiducials_;
 
-    struct {
-        bool show_debug_image = true;
-        double marker_dot_displacement = 0.05;
-        bool publish_fiducials = true;
-    } config_;
+    tuw_marker_playground::DiceConfig config_;
+
 
     void imageCallback(const sensor_msgs::ImageConstPtr &image_msg, const sensor_msgs::CameraInfoConstPtr &camer_info_);
 

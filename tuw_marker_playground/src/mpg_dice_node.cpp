@@ -135,12 +135,18 @@ void MPGDiceNode::imageCallback(const sensor_msgs::ImageConstPtr &image_msg, con
         cv::SimpleBlobDetector::Params params;
 
         // Filter by Circularity
-        //params.filterByCircularity = true;
-        //params.minConvexity = 0.95;
+        if(config_.filter_circularity_enabled) {
+            params.filterByCircularity = true;
+            params.minCircularity = config_.filter_circularity_min;
+            params.maxCircularity = config_.filter_circularity_max;
+        }
 
-        // Filter by Convexity
-        //params.filterByConvexity = true;
-        //params.minConvexity = 0.95;
+        // Filter by Circularity
+        if(config_.filter_convexity_enabled) {
+            params.filterByConvexity = true;
+            params.minConvexity = config_.filter_convexity_min;
+            params.maxConvexity = config_.filter_convexity_max;
+        }
 
         cv::Ptr<cv::FeatureDetector> blobsDetector = cv::SimpleBlobDetector::create(params);
         std::vector<cv::KeyPoint> keypoints;
@@ -306,9 +312,7 @@ void MPGDiceNode::imageCallback(const sensor_msgs::ImageConstPtr &image_msg, con
 }
 
 void MPGDiceNode::configCallback(tuw_marker_playground::DiceConfig &config, uint32_t level) {
-    config_.show_debug_image = config.show_debug_image;
-    config_.marker_dot_displacement = config.marker_dot_displacement;
-    config_.publish_fiducials = config.publish_fiducials;
+    config_ = config;
 }
 
 struct ComparePoints

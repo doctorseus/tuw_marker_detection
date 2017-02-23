@@ -51,6 +51,13 @@
     <param name="marker_dot_displacement" value="0.035"/>
     <param name="publish_fiducials" value="true"/>
 
+    <param name="filter_circularity_enabled" value="true"/>
+    <param name="filter_circularity_min" value="0.66"/>
+    <param name="filter_circularity_max" value="1.0"/>
+    <param name="filter_convexity_enabled" value="true"/>
+    <param name="filter_convexity_min" value="0.95"/>
+    <param name="filter_convexity_max" value="1.0"/>
+
     <remap from="image" to="/camera/image_raw"/>
     <remap from="camera_info" to="/camera/camera_info"/>
     <remap from="fiducials" to="/fiducialsDice"/>
