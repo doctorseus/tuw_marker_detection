@@ -32,18 +32,10 @@
     <node pkg="tf" type="static_transform_publisher" name="camera_mount_bar_broadcaster" args="0 0 0.615 0 0 0 1 base_link camera_mount_bar 100" />
 
     <node name="tuw_checkerboard_node" pkg="tuw_checkerboard" type="tuw_checkerboard_node" output="screen">
-        <!--
-        <param name="checkerboard_size_col" value="9" />
-        <param name="checkerboard_size_row" value="6" />
-        <param name="checkerboard_square_size" value="0.0365" type="double" />
-        <param name="checkerboard_min_square_size" value="4" />
+        <param name="checkerboard_columns" value="9" />
+        <param name="checkerboard_rows" value="6" />
+        <param name="checkerboard_square_size" value="0.0365" />
 
-        <param name="adaptive_thresh" value="True" />
-        <param name="subpixelfit" value="True" />
-        <param name="filter_quads" value="True" />
-        <param name="fast_check" value="True" />
-        <param name="frame_id" value="checkerboard_static" />
-        -->
         <remap from="image" to="/camera/image_raw"/>
         <remap from="camera" to="/camera"/>
     </node>
