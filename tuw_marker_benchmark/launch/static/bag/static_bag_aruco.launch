@@ -1,0 +1,18 @@
+<launch>
+    <arg name="base" />
+    <arg name="pos" />
+
+    <arg name="type" default="aruco" />
+    <arg name="rate" default="1.0" />
+
+    <include file="$(find tuw_marker_benchmark)/launch/static/bag/static_inc_bag.launch">
+        <arg name="bag" default="map_base$(arg base)_pos$(arg pos).bag" />
+        <arg name="rate" default="$(arg rate)" />
+    </include>
+
+    <include file="$(find tuw_marker_benchmark)/launch/static/bag/static_inc_marker_$(arg type).launch" />
+    <include file="$(find tuw_marker_benchmark)/launch/static/bag/static_inc_benchmark.launch">
+        <arg name="output_directory" default="$(arg type)/map_base$(arg base)_pos$(arg pos)" />
+    </include>
+</launch>
+

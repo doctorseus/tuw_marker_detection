@@ -37,6 +37,9 @@
 
     <!-- Benchmark node -->
     <node pkg="tuw_marker_benchmark" type="data_collector_node.py" name="tuw_marker_benchmark" output="screen">
+        <param name="tf_camera" value="p3dx/camera"/>
+        <param name="tf_odom" value="p3dx/odom"/>
+
         <remap from="map" to="/markerMap" />
         <remap from="markerDetection" to="/markerDetection" />
     </node>

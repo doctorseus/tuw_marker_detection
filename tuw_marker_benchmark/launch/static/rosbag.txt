@@ -1,0 +1,49 @@
+roslaunch tuw_marker_benchmark static_map_play.launch base:=0 pos:=0
+
+
+rosbag record --duration=30 /camera/camera_info /camera/image_raw/compressed /markerMap /rosout /rosout_agg /tf /tf_static -O map_base0_pos0.bag
+rosbag record --duration=30 /camera/camera_info /camera/image_raw/compressed /markerMap /rosout /rosout_agg /tf /tf_static -O map_base0_pos3.bag
+
+
+
+/camera/camera_info
+/camera/image_raw/compressed
+/markerMap
+/rosout
+/rosout_agg
+/tf
+/tf_static
+
+/rosout /rosout_agg /p3dx/aria/odom /p3dx/camera/camera_info /p3dx/camera/image_raw/compressed /tf /tf_static
+
+/camera/camera_info
+/camera/image_raw
+/camera/image_raw/compressed
+/camera/image_raw/compressed/parameter_descriptions
+/camera/image_raw/compressed/parameter_updates
+/camera/image_raw/compressedDepth
+/camera/image_raw/compressedDepth/parameter_descriptions
+/camera/image_raw/compressedDepth/parameter_updates
+/camera/image_raw/theora
+/camera/image_raw/theora/parameter_descriptions
+/camera/image_raw/theora/parameter_updates
+/camera/image_thumbnail
+/camera/image_thumbnail/compressed
+/camera/image_thumbnail/compressed/parameter_descriptions
+/camera/image_thumbnail/compressed/parameter_updates
+/camera/image_thumbnail/compressedDepth
+/camera/image_thumbnail/compressedDepth/parameter_descriptions
+/camera/image_thumbnail/compressedDepth/parameter_updates
+/camera/image_thumbnail/theora
+/camera/image_thumbnail/theora/parameter_descriptions
+/camera/image_thumbnail/theora/parameter_updates
+/camera/parameter_descriptions
+/camera/parameter_updates
+/clicked_point
+/initialpose
+/markerMap
+/move_base_simple/goal
+/rosout
+/rosout_agg
+/tf
+/tf_static

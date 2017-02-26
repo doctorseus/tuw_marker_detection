@@ -1,0 +1,7 @@
+<launch>
+
+    <!-- RViz -->
+    <node name="rviz" pkg="rviz" type="rviz" args="-d  $(find tuw_marker_benchmark)/rviz/demo_static_config.rviz" />
+
+</launch>
+

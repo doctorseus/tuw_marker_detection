@@ -36,12 +36,13 @@ class TfToMarkerMapNode:
         msg.header.stamp = rospy.Time.now()
 
         markers = []
-        for tf in self.tf_list:
-            pass
+        for idx, tf in enumerate(self.tf_list):
             try:
                 tfs = self.tfb.lookup_transform(self.tf_frame_id, tf, rospy.Time(0))
 
                 marker = Marker()
+                marker.ids = [idx]
+                marker.ids_confidence = [1]
                 marker.pose = Pose()
                 marker.pose.position = tfs.transform.translation
                 marker.pose.orientation = tfs.transform.rotation

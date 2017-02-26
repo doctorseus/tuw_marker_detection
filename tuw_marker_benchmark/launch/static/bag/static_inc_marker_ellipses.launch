@@ -1,0 +1,19 @@
+<launch>
+    <!-- Ellipses -->
+    <node pkg="tuw_ellipses" type="ellipses_node" name="ellipses_node" output="screen" >
+        <param name="show_camera_image" value="false"/>
+        <param name="debug" value="false"/>
+
+        <param name="circle_diameter" value="0.10" />
+
+        <remap from="image" to="camera/image_raw_uncompressed"/>
+        <remap from="camera_info" to="camera/camera_info"/>
+        <remap from="fiducials" to="/fiducialsEllipses"/>
+    </node>
+
+    <node pkg="tuw_marker_pose_estimation" type="pose_estimation_node" name="arPoseEstimationEllipses" output="screen">
+        <remap from="fiducials" to="/fiducialsEllipses"/>
+        <remap from="markers" to="/markerDetection"/>
+    </node>
+</launch>
+

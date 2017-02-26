@@ -6,13 +6,8 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /TF1
         - /TF1/Frames1
         - /TF1/Tree1
-        - /Image1
-        - /MarkerWithCovarianceArray1
-        - /MarkerDetection1
-        - /MarkerDetection2
       Splitter Ratio: 0.5
     Tree Height: 474
   - Class: rviz/Selection
@@ -62,18 +57,34 @@ Visualization Manager:
         All Enabled: false
         base_link:
           Value: true
+        box_anchor:
+          Value: true
         camera:
           Value: true
         camera_mount_bar:
           Value: true
+        checkerboard:
+          Value: true
         checkerboard_static:
+          Value: true
+        ellipses_node/t0-0:
+          Value: true
+        marker_aruco:
+          Value: true
+        marker_checkerboard:
+          Value: true
+        marker_dice:
+          Value: true
+        marker_ellipse:
           Value: true
         odom:
           Value: true
         t0:
           Value: false
-        t13:
-          Value: false
+        t?:
+          Value: true
+        type0_base:
+          Value: true
       Marker Scale: 0.5
       Name: TF
       Show Arrows: true
@@ -83,14 +94,28 @@ Visualization Manager:
         odom:
           base_link:
             camera:
+              checkerboard:
+                {}
+              ellipses_node/t0-0:
+                {}
               t0:
                 {}
-              t13:
+              t?:
                 {}
             camera_mount_bar:
               {}
             checkerboard_static:
               {}
+            type0_base:
+              box_anchor:
+                marker_aruco:
+                  {}
+                marker_checkerboard:
+                  {}
+                marker_dice:
+                  {}
+                marker_ellipse:
+                  {}
       Update Interval: 0
       Value: true
     - Class: rviz/Image
@@ -122,7 +147,7 @@ Visualization Manager:
       Name: MarkerDetection
       Show Axes: true
       Show Label: true
-      Show Marker: false
+      Show Marker: true
       Topic: /markerDetectionAruco
       Unreliable: false
       Value: true
@@ -135,6 +160,28 @@ Visualization Manager:
       Show Label: true
       Show Marker: true
       Topic: /markerDetectionDice
+      Unreliable: false
+      Value: true
+    - Class: marker_rviz_plugin/MarkerDetection
+      Color Label: 170; 170; 170
+      Enabled: true
+      Marker Size: 0.300000012
+      Name: MarkerDetection
+      Show Axes: true
+      Show Label: true
+      Show Marker: true
+      Topic: /markerDetectionCheckerboard
+      Unreliable: false
+      Value: true
+    - Class: marker_rviz_plugin/MarkerDetection
+      Color Label: 170; 170; 170
+      Enabled: true
+      Marker Size: 0.300000012
+      Name: MarkerDetection
+      Show Axes: true
+      Show Label: true
+      Show Marker: true
+      Topic: /markerDetectionEllipses
       Unreliable: false
       Value: true
   Enabled: true
@@ -161,7 +208,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 2.20026827
+      Distance: 1.7247299
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
@@ -175,10 +222,10 @@ Visualization Manager:
       Focal Shape Size: 0.0500000007
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.365398228
+      Pitch: 0.46039781
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 5.40552044
+      Yaw: 5.04050684
     Saved: ~
 Window Geometry:
   Displays:

@@ -1,0 +1,15 @@
+<launch>
+    <arg name="output_directory" />
+
+    <!-- Benchmark node -->
+    <node pkg="tuw_marker_benchmark" type="data_collector_node.py" name="tuw_marker_benchmark" required="true" output="screen">
+        <param name="tf_camera" value="camera"/>
+        <param name="tf_odom" value="odom"/>
+
+        <param name="timeout" value="5"/>
+        <param name="directory_path" value="$(find tuw_marker_benchmark)/data/static/$(arg output_directory)" />
+
+        <remap from="map" to="/markerMap" />
+        <remap from="markerDetection" to="/markerDetection" />
+    </node>
+</launch>

@@ -1,0 +1,2 @@
+roslaunch tuw_marker_benchmark static_bag_aruco.launch base:=0 pos:=0
+roslaunch tuw_marker_benchmark static_bag_ellipses.launch base:=0 pos:=0

@@ -1,0 +1,12 @@
+<launch>
+
+    <!-- Camera -->
+    <include file="$(find tuw_marker_benchmark)/launch/inc_dummy_camera.launch" />
+
+    <!-- TF -->
+    <node pkg="tf" type="static_transform_publisher" name="base_link_broadcaster" args="0 0 0 0 0 0 1 odom base_link 100" />
+    <node pkg="tf" type="static_transform_publisher" name="camera_mount_bar_broadcaster" args="0 0 0.615 0 0 0 1 base_link camera_mount_bar 100" />
+    <node pkg="tf" type="static_transform_publisher" name="camera_broadcaster" args="0.01273110107 -0.00271453602046 0.636257383815 0.570464072788 -0.576383801312 0.412362280278 -0.41510216218 base_link camera 100" />
+
+</launch>
+

@@ -47,7 +47,7 @@
 
   <!-- Dice -->
   <node pkg="tuw_marker_playground" type="mpg_dice_node" name="mpgDice" output="screen">
-    <param name="show_debug_image" value="true"/>
+    <param name="show_debug_image" value="false"/>
     <param name="marker_dot_displacement" value="0.035"/>
     <param name="publish_fiducials" value="true"/>
 
@@ -69,19 +69,24 @@
   </node>
 
   <!-- Checkerboard -->
-  <node pkg="tuw_checkerboard" type="tuw_checkerboard_node" name="tuw_checkerboard_node" output="screen">
-    <param name="show_camera_image" value="false"/>
+  <!-- launch-prefix="gdb -ex run -\-args" -->
+  <node pkg="tuw_checkerboard" type="tuw_checkerboard_node" name="tuw_checkerboard_node" output="screen" >
+    <param name="show_camera_image" value="true"/>
     <!--
     <param name="plubish_tf" value="False" />
     <param name="plubish_marker" value="False" />
     <param name="publish_fiducials" value="True" />
     <param name="publish_pose" value="False" />
     -->
-
-    <param name="checkerboard_columns" value="5" />
-    <param name="checkerboard_rows" value="5" />
-    <param name="checkerboard_square_size" value="0.03658 " />
+    <param name="checkerboard_columns" value="3" />
+    <param name="checkerboard_rows" value="3" />
+    <param name="checkerboard_square_size" value="0.0275" />
     <param name="checkerboard_min_square_size" value="5" />
+
+    <param name="adaptive_thresh" value="True" />
+    <param name="normalize_image" value="True" />
+    <param name="filter_quads" value="False" />
+    <param name="fast_check" value="True" />
 
     <remap from="image" to="/camera/image_raw"/>
     <remap from="camera" to="/camera"/>
@@ -91,6 +96,23 @@
   <node pkg="tuw_marker_pose_estimation" type="pose_estimation_node" name="arPoseEstimationCheckerboard" output="screen">
     <remap from="fiducials" to="/fiducialsCheckerboard"/>
     <remap from="markers" to="/markerDetectionCheckerboard"/>
+  </node>
+
+  <!-- Ellipses -->
+  <node pkg="tuw_ellipses" type="ellipses_node" name="ellipses_node" output="screen" >
+    <param name="show_camera_image" value="false"/>
+    <param name="debug" value="false"/>
+
+    <param name="circle_diameter" value="0.10" />
+
+    <remap from="image" to="camera/image_raw"/>
+    <remap from="camera_info" to="camera/camera_info"/>
+    <remap from="fiducials" to="/fiducialsEllipses"/>
+  </node>
+
+  <node pkg="tuw_marker_pose_estimation" type="pose_estimation_node" name="arPoseEstimationEllipses" output="screen">
+    <remap from="fiducials" to="/fiducialsEllipses"/>
+    <remap from="markers" to="/markerDetectionEllipses"/>
   </node>
 
   <!-- RViz -->
