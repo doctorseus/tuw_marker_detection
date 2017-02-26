@@ -1,26 +1,40 @@
 #!/usr/bin/env python
 import json
+import sys
+import os
 from benchmark import Benchmark
 from models import BMap, BMarkerDetection, BMarkerDetectionWithCameraPose
 
 
-class DataCollection:
+class SamplePair:
 
-    def __init__(self, bmap, bdetections):
+    def __init__(self, bmap, bmarker_detection):
         self.bmap = bmap
-        self.bdetections = bdetections
+        self.bmarker_detection = bmarker_detection
 
 if __name__ == '__main__':
-    bmap = None
-    bdetections = []
+    samples = []
 
-    with open('../data/static/aruco/map_base0_pos3/map.json', 'r') as f:
-        bmap = BMap.from_json(json.load(f))
+    sample_directory_paths = sys.argv[1:]
+    sample_paths = map(lambda directory_path: (os.path.join(directory_path, 'map.json'), os.path.join(directory_path, 'marker_detections.json')), sample_directory_paths)
 
-    with open('../data/static/aruco/map_base0_pos3/marker_detections.json', 'r') as f:
-        detection_objs = json.load(f)
-        bdetections = map(BMarkerDetectionWithCameraPose.from_json, detection_objs)
+    for (map_path, detections_path) in sample_paths:
+        print('Load %s - %s' % (map_path, detections_path))
 
-    benchmark = Benchmark(bmap, bdetections)
+        with open(map_path, 'r') as f:
+            bmap = BMap.from_json(json.load(f))
+
+        with open(detections_path, 'r') as f:
+            detection_objs = json.load(f)
+            bdetections = map(BMarkerDetectionWithCameraPose.from_json, detection_objs)
+
+        print(' - Found %d marker detections.' % len(bdetections))
+
+        for bdetection in bdetections:
+            samples.append(SamplePair(bmap, bdetection))
+
+    print('Total samples found: %d' % len(samples))
+
+    benchmark = Benchmark(samples)
     benchmark.run()
     benchmark.store_results()
