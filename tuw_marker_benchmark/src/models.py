@@ -138,4 +138,4 @@ class BMarkerDetectionWithCameraPose(BMarkerDetection):
 
     @staticmethod
     def from_json(obj):
-        return BMarkerDetection(obj['header'], obj['camera'], map(BMarker.from_json, obj['markers']))
+        return BMarkerDetectionWithCameraPose(obj['header'], BPose.from_json(obj['camera']), map(BMarker.from_json, obj['markers']))
