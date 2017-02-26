@@ -3,14 +3,14 @@ import rospy
 import os
 import json
 import time
-from tf2_ros import Buffer, TransformListener, TFMessage
+from tf2_ros import Buffer, TransformListener, TFMessage, TransformStamped
 from tf2_py import ExtrapolationException, TransformException, LookupException, ConnectivityException
 from tf2_geometry_msgs import *
 from geometry_msgs.msg import PoseStamped
 from tuw_marker_benchmark.srv import StoreData, ClearData
 from marker_msgs.msg import MarkerWithCovarianceArray
 from marker_msgs.msg import MarkerDetection
-from models import BMap, BMarkerDetection, BPose
+from models import BMap, BMarkerDetectionWithCameraPose, BPose
 
 from visualization_msgs.msg import Marker as VisualMarker
 from geometry_msgs.msg import Point
@@ -126,15 +126,20 @@ class DataCollectorNode:
         # Reset timeout handler
         self.time_last_update = time.time()
 
-        # Marker are detected relative to camera position. Convert positions to absolute values.
-        bmarker_detection = BMarkerDetection.from_MarkerDetection_msg(msg)
-
         try:
+            # Get camera absolute position
+            camera_tf = self.tfb.lookup_transform(self.config.tf_odom, self.config.tf_camera, msg.header.stamp)
+            camera_pose = BPose.from_Transform_msg(camera_tf)
+
+            # Marker are detected relative to camera position. Convert positions to absolute values.
+            bmarker_detection = BMarkerDetectionWithCameraPose.from_MarkerDetection_msg(msg, camera_pose)
+
             for marker in bmarker_detection.markers:
                 marker.pose = transform_bpose(self.tfb, marker.pose, msg.header.stamp, self.config.tf_camera, self.config.tf_odom)
             bmarker_detection.header['frame_id'] = self.config.tf_odom
 
             self.marker_detections.append(bmarker_detection)
+
         except (ExtrapolationException, LookupException, ConnectivityException) as e:
             rospy.logwarn('Skipped marker detection message: %s' % e)
 
@@ -179,7 +184,7 @@ class DataCollectorNode:
         # Save detections
         path_marker_detections = os.path.join(directory_path, 'marker_detections.json')
         with open(path_marker_detections, 'w') as f:
-            json_marker_detections = map(BMarkerDetection.to_json, bmarker_detections)
+            json_marker_detections = map(BMarkerDetectionWithCameraPose.to_json, bmarker_detections)
             json.dump(json_marker_detections, indent=2, fp=f)
             pass
 
