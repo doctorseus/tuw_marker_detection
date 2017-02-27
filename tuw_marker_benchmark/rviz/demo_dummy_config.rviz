@@ -57,19 +57,19 @@ Visualization Manager:
         All Enabled: false
         base_link:
           Value: true
-        box_anchor:
-          Value: true
         camera:
           Value: true
         camera_mount_bar:
           Value: true
         checkerboard:
           Value: true
-        checkerboard_static:
-          Value: true
         ellipses_node/t0-0:
           Value: true
+        marker_anchor:
+          Value: true
         marker_aruco:
+          Value: true
+        marker_base:
           Value: true
         marker_checkerboard:
           Value: true
@@ -81,10 +81,6 @@ Visualization Manager:
           Value: true
         t0:
           Value: false
-        t?:
-          Value: true
-        type0_base:
-          Value: true
       Marker Scale: 0.5
       Name: TF
       Show Arrows: true
@@ -100,22 +96,18 @@ Visualization Manager:
                 {}
               t0:
                 {}
-              t?:
-                {}
             camera_mount_bar:
               {}
-            checkerboard_static:
-              {}
-            type0_base:
-              box_anchor:
-                marker_aruco:
-                  {}
-                marker_checkerboard:
-                  {}
-                marker_dice:
-                  {}
-                marker_ellipse:
-                  {}
+          marker_base:
+            marker_anchor:
+              marker_aruco:
+                {}
+              marker_checkerboard:
+                {}
+              marker_dice:
+                {}
+              marker_ellipse:
+                {}
       Update Interval: 0
       Value: true
     - Class: rviz/Image
@@ -176,7 +168,7 @@ Visualization Manager:
     - Class: marker_rviz_plugin/MarkerDetection
       Color Label: 170; 170; 170
       Enabled: true
-      Marker Size: 0.300000012
+      Marker Size: 0.100000001
       Name: MarkerDetection
       Show Axes: true
       Show Label: true
@@ -225,7 +217,7 @@ Visualization Manager:
       Pitch: 0.46039781
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 5.04050684
+      Yaw: 5.03550673
     Saved: ~
 Window Geometry:
   Displays:

@@ -55,7 +55,7 @@
   <!-- Checkerboard -->
   <!-- launch-prefix="gdb -ex run -\-args" -->
   <node pkg="tuw_checkerboard" type="tuw_checkerboard_node" name="tuw_checkerboard_node" output="screen" >
-    <param name="show_camera_image" value="true"/>
+    <param name="show_camera_image" value="false"/>
     <!--
     <param name="plubish_tf" value="False" />
     <param name="plubish_marker" value="False" />
@@ -92,12 +92,17 @@
     <remap from="image" to="camera/image_raw"/>
     <remap from="camera_info" to="camera/camera_info"/>
     <remap from="fiducials" to="/fiducialsEllipses"/>
+    <remap from="marker" to="/markerDetectionEllipses"/>
   </node>
+
+  <!--
+  Use internal ellipses pose estimation...
 
   <node pkg="tuw_marker_pose_estimation" type="pose_estimation_node" name="arPoseEstimationEllipses" output="screen">
     <remap from="fiducials" to="/fiducialsEllipses"/>
     <remap from="markers" to="/markerDetectionEllipses"/>
   </node>
+  -->
 
   <!-- RViz -->
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find tuw_marker_benchmark)/rviz/demo_dummy_config.rviz" />

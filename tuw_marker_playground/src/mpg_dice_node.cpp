@@ -194,23 +194,23 @@ void MPGDiceNode::imageCallback(const sensor_msgs::ImageConstPtr &image_msg, con
                 std::vector<float> dists;
                 kdtree.knnSearch(query, indices, dists, 5);
 
-                // store them as borderPoints
-                std::vector<cv::Point2f> borderPoints;
+                // store them as markerPoints
+                std::vector<cv::Point2f> markerPoints;
                 for (size_t z = 1; z < indices.size(); z++) {
                     if(dists[z] > 0)
-                        borderPoints.push_back(keypoints[indices[z]].pt);
+                        markerPoints.push_back(keypoints[indices[z]].pt);
                 }
 
 
                 // Try to find only valid patterns
                 // FIXME: This is not a very good discriminator, but it works for a first test.
-                if(borderPoints.size() == 4) {
+                if(markerPoints.size() == 4) {
 
                     // Add center point
                     // markerPoints.push_back(point);
 
                     // Use point as centerPoint for sorting
-                    MPGDiceMarker diceMarker(point, borderPoints);
+                    MPGDiceMarker diceMarker(point, markerPoints);
 
                     cv::Point2f intercPoint;
                     if(intersection(diceMarker.borderPoints[0], diceMarker.borderPoints[2], diceMarker.borderPoints[1], diceMarker.borderPoints[3], intercPoint)) {
@@ -219,7 +219,7 @@ void MPGDiceNode::imageCallback(const sensor_msgs::ImageConstPtr &image_msg, con
                         float epsilon = 10;
                         if(sqrt(pow(diff.x, 2) + pow(diff.y, 2)) < epsilon){
                             // This seems to be a valid marker, use intercPoint as centerPoint
-                            rawMarkers.push_back(MPGDiceMarker(intercPoint, borderPoints));
+                            rawMarkers.push_back(MPGDiceMarker(intercPoint, markerPoints));
                         }
                     }
                 }
