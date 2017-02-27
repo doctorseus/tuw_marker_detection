@@ -1,3 +1,5 @@
+from benchmark import Benchmark
+
 import os
 import json
 import rospy
@@ -23,12 +25,36 @@ def BPose_to_Transform_msg(bpose, frame_id, child_frame_id):
     tf.transform.rotation.w = bpose.orientation[3]
     return tf
 
+def calculate_mean(data):
+    return sum(data) / (len(data) - 1)
 
-class Benchmark:
+def calculate_variance(data):
+    mean = calculate_mean(data)
+    return sum(map(lambda x: math.pow(x - mean, 2), data)) / (len(data) - 1)
+
+def calculate_distribution(data):
+    return math.sqrt(calculate_variance(data))
+
+class DataPoint():
+
+    def __init__(self, data_id):
+        self.data_id = data_id
+        self.x = []
+        self.y = []
+
+    def add(self, x, y):
+        self.x.append(x)
+        self.y.append(y)
+
+    def __str__(self):
+        return 'DataPoint[id=%s, x[mean=%s, var=%s], y[mean=%s, var=%s]' % (self.data_id, calculate_mean(self.x), calculate_distribution(self.x), calculate_mean(self.y), calculate_distribution(self.y))
+
+
+class StaticBenchmark(Benchmark):
 
     def __init__(self, samples):
         self.samples = samples
-        self.state = {}
+        self.data_points = {}
 
     def run(self):
         processed = 0
@@ -37,11 +63,25 @@ class Benchmark:
                 processed += 1
         print('Total samples processed: %d' % processed)
 
+    def euler_degree_from_quaternion(self, quaternion):
+        euler = transformations.euler_from_quaternion(list(reversed(quaternion)), axes='rzyx')
+        return map(lambda radian: radian * 180/math.pi, euler)
+
+    def get_data_point_id(self, map_marker):
+        angles = self.euler_degree_from_quaternion(map_marker.pose.orientation)
+        angle_diff = 180 + round(angles[0], 2)
+        return '%s' % str(angle_diff)
+
     def process_sample(self, sample):
         bmap = sample.bmap
         marker_detection = sample.bmarker_detection
 
+        # Only one marker should be present
+        if len(marker_detection.markers) > 1:
+            return False
+
         kdtree = self.create_kdtree(bmap)
+
         for detected_marker in marker_detection.markers:
             map_marker = self.match_marker(kdtree, bmap, detected_marker)
 
@@ -49,7 +89,9 @@ class Benchmark:
                 print('Marker could not be matched to any map marker.')
                 return False
 
-            #print('%s == %s' % (str(detected_marker.id), str(map_marker.id)))
+            # print('%s == %s' % (str(detected_marker.id), str(map_marker.id)))
+
+            data_point_id = self.get_data_point_id(map_marker)
 
             # Setup TF tree
             tfb = Buffer(cache_time=rospy.Duration(30.0), debug=False)
@@ -59,21 +101,11 @@ class Benchmark:
 
             marker_tfm = tfb.lookup_transform('map_marker', 'detected_marker', rospy.Time(0))
 
-            x = marker_tfm.transform.translation.x
-            y = marker_tfm.transform.translation.y
+            x = marker_tfm.transform.translation.x * 100
+            y = marker_tfm.transform.translation.y * 100
 
-            print(marker_tfm.transform.translation)
-            print('%s - %s' % (str(x), str(y)))
+            self.data_points.setdefault(data_point_id, DataPoint(data_point_id)).add(x, y)
 
-            q_map_marker = map_marker.pose.orientation
-            q_map_marker = [y for x in [[q_map_marker[3]], q_map_marker[0:3]] for y in x]
-            e_map_marker = transformations.euler_from_quaternion(q_map_marker)
-            e_map_marker = map(lambda radian: radian * 180/math.pi, e_map_marker)
-
-            angle_deg = round(e_map_marker[0], 2)
-
-            if angle_deg not in self.state.setdefault('data_points', []):
-                self.state.setdefault('data_points', []).append(angle_deg)
 
             '''
             q_camera = marker_detection.camera.orientation
@@ -99,7 +131,6 @@ class Benchmark:
             if angle_deg not in self.state.setdefault('data_points', []):
                 self.state.setdefault('data_points', []).append(angle_deg)
             '''
-
         return True
 
     def create_kdtree(self, bmap):
@@ -120,8 +151,11 @@ class Benchmark:
         return bmap.markers[idx]
 
     def store_results(self):
-        pass
+        keys = map(float, self.data_points.keys())
+        keys.sort()
 
-        #self.state['data_points'] = map(lambda data_point: data_point-self.state['data_points'][0], self.state['data_points'])
+        for key in keys:
+             print(str(self.data_points[str(key)]))
 
-        print(self.state)
+        #for key in sorted(map(lambda d: float(d), self.data_points.keys())):
+        #    print(str(self.data_points[key]))

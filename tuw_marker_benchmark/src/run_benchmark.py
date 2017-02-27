@@ -2,7 +2,7 @@
 import json
 import sys
 import os
-from benchmark import Benchmark
+from analysis import StaticBenchmark
 from models import BMap, BMarkerDetection, BMarkerDetectionWithCameraPose
 
 
@@ -35,6 +35,6 @@ if __name__ == '__main__':
 
     print('Total samples found: %d' % len(samples))
 
-    benchmark = Benchmark(samples)
+    benchmark = StaticBenchmark(samples)
     benchmark.run()
     benchmark.store_results()
