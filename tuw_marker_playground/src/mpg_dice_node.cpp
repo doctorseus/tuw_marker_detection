@@ -97,6 +97,21 @@ void MPGDiceNode::publishFiducials(const std_msgs::Header &header, std::vector<M
     pub_fiducials_.publish(msg);
 }
 
+static bool intersection(cv::Point2f o1, cv::Point2f p1, cv::Point2f o2, cv::Point2f p2, cv::Point2f &r)
+{
+    cv::Point2f x = o2 - o1;
+    cv::Point2f d1 = p1 - o1;
+    cv::Point2f d2 = p2 - o2;
+
+    float cross = d1.x*d2.y - d1.y*d2.x;
+    if (abs(cross) < /*EPS*/1e-8)
+        return false;
+
+    double t1 = (x.x * d2.y - x.y * d2.x)/cross;
+    r = o1 + d1 * t1;
+    return true;
+}
+
 void MPGDiceNode::imageCallback(const sensor_msgs::ImageConstPtr &image_msg, const sensor_msgs::CameraInfoConstPtr &camer_info_) {
     cv_bridge::CvImagePtr imgPtr;
     try {
@@ -153,7 +168,7 @@ void MPGDiceNode::imageCallback(const sensor_msgs::ImageConstPtr &image_msg, con
         blobsDetector->detect(image, keypoints);
 
 
-        std::vector<MPGDiceMarker> markers;
+        std::vector<MPGDiceMarker> rawMarkers;
         if(keypoints.size() > 0){
 
             // Create kdTree
@@ -179,37 +194,79 @@ void MPGDiceNode::imageCallback(const sensor_msgs::ImageConstPtr &image_msg, con
                 std::vector<float> dists;
                 kdtree.knnSearch(query, indices, dists, 5);
 
-                // store them as markerPoints
-                std::vector<cv::Point2f> markerPoints;
+                // store them as borderPoints
+                std::vector<cv::Point2f> borderPoints;
                 for (size_t z = 1; z < indices.size(); z++) {
                     if(dists[z] > 0)
-                        markerPoints.push_back(keypoints[indices[z]].pt);
+                        borderPoints.push_back(keypoints[indices[z]].pt);
                 }
 
 
                 // Try to find only valid patterns
                 // FIXME: This is not a very good discriminator, but it works for a first test.
-                if(markerPoints.size() == 4) {
+                if(borderPoints.size() == 4) {
 
                     // Add center point
                     // markerPoints.push_back(point);
 
-                    // Calculate mean point of borderPoints
-                    cv::Point2f zero(0.0f, 0.0f);
-                    cv::Point2f sum  = std::accumulate(markerPoints.begin(), markerPoints.end(), zero);
-                    cv::Point2f mean(sum.x / markerPoints.size(), sum.y / markerPoints.size());
+                    // Use point as centerPoint for sorting
+                    MPGDiceMarker diceMarker(point, borderPoints);
 
-                    // Is this the dice center?
-                    cv::Point2f diff = mean-point;
-                    float epsilon = 10;
-                    if(sqrt(pow(diff.x, 2) + pow(diff.y, 2)) < epsilon){
-                        // This seems to be a valid marker
-                        markers.push_back(MPGDiceMarker(point, mean, markerPoints));
+                    cv::Point2f intercPoint;
+                    if(intersection(diceMarker.borderPoints[0], diceMarker.borderPoints[2], diceMarker.borderPoints[1], diceMarker.borderPoints[3], intercPoint)) {
+                        // Is this the dice center?
+                        cv::Point2f diff = intercPoint-point;
+                        float epsilon = 10;
+                        if(sqrt(pow(diff.x, 2) + pow(diff.y, 2)) < epsilon){
+                            // This seems to be a valid marker, use intercPoint as centerPoint
+                            rawMarkers.push_back(MPGDiceMarker(intercPoint, borderPoints));
+                        }
                     }
                 }
             }
 
         }
+
+
+        // Remove all markers which share border points/overlap
+        // FIXME: Quick and ugly, this is only done to remove the checkerboard...
+        std::vector<MPGDiceMarker> markers;
+        for (auto &marker:rawMarkers) {
+            bool overlap = false;
+
+            // Border points and center point
+            std::vector<cv::Point2f> points;
+            for(auto &point:marker.borderPoints)
+                points.push_back(point);
+            points.push_back(marker.centerPoint);
+
+            for(auto &fpoint:points) {
+                for (auto &otherMarker:rawMarkers) {
+                    if(marker != otherMarker) {
+                        // Border points and center point
+                        std::vector<cv::Point2f> otherPoints;
+                        for(auto &point:otherMarker.borderPoints)
+                            otherPoints.push_back(point);
+                        otherPoints.push_back(otherMarker.centerPoint);
+
+                        // Iterate trough all points...
+                        for(auto &otherPoint:otherPoints) {
+
+                            // Test if points are close -> equal
+                            // FIXME: Instead of centerpoint use used blob
+                            cv::Point2f diff = fpoint-otherPoint;
+                            float epsilon = 10;
+                            if(sqrt(pow(diff.x, 2) + pow(diff.y, 2)) < epsilon)
+                                overlap = true;
+                        }
+                    }
+                }
+            }
+
+            if(!overlap)
+                markers.push_back(marker);
+        }
+
 
 
         // Publish fiducials
@@ -234,7 +291,7 @@ void MPGDiceNode::imageCallback(const sensor_msgs::ImageConstPtr &image_msg, con
                     cv::putText(debugImage, msg, marker.borderPoints[z], 1, 3, cv::Scalar(255, 255, 0));
                 }
 
-                cv::circle(debugImage, marker.borderMean, 5, cv::Scalar(0, 0, 255), 1);
+                cv::circle(debugImage, marker.centerPoint, 5, cv::Scalar(0, 0, 255), 1);
             }
 
             /*
@@ -349,10 +406,8 @@ struct ComparePoints
 };
 
 
-MPGDiceMarker::MPGDiceMarker(cv::Point2f centerPoint, cv::Point2f borderMean, std::vector<cv::Point2f> borderPoints) {
+MPGDiceMarker::MPGDiceMarker(cv::Point2f centerPoint, std::vector<cv::Point2f> borderPoints) {
     this->centerPoint = centerPoint;
-    this->borderMean = borderMean;
-
     std::sort(borderPoints.begin(), borderPoints.end(), ComparePoints(*this));
     this->borderPoints = borderPoints;
 }

@@ -4,7 +4,7 @@
 
     <include file="$(find tuw_marker_benchmark)/launch/static/static_inc_tf_dummy.launch" />
 
-    <node pkg="tf" type="static_transform_publisher" name="marker_base" if="$(eval arg('base') == 0)" args="1.112 0 0 0 0 0 odom marker_base 100" />
+    <node pkg="tf" type="static_transform_publisher" name="marker_base" if="$(eval arg('base') == 0)" args="1.122 0 0 0 0 0 odom marker_base 100" />
 
     <arg name="anchor_height" default="0.358" />
     <node pkg="tf" type="static_transform_publisher" name="marker_anchor" if="$(eval arg('pos') == 0)" args="0 0 $(arg anchor_height)  1.17809 0 0 marker_base marker_anchor 100" />

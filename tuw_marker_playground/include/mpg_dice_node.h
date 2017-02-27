@@ -50,14 +50,23 @@
 
 class MPGDiceMarker {
 public:
-    MPGDiceMarker(cv::Point2f centerPoint, cv::Point2f borderMean, std::vector<cv::Point2f> borderPoints);
+    MPGDiceMarker(cv::Point2f centerPoint, std::vector<cv::Point2f> borderPoints);
+
     ~MPGDiceMarker();
 
     cv::Point2f centerPoint;
-    cv::Point2f borderMean;
     std::vector<cv::Point2f> borderPoints;
 
     std::vector<cv::Point3f> get3DPoints(float offset);
+
+    friend bool operator==(const MPGDiceMarker &m1, const MPGDiceMarker &m2) {
+        // Only compare center Point
+        return (m1.centerPoint == m2.centerPoint);
+    }
+
+    friend bool operator!=(const MPGDiceMarker &m1, const MPGDiceMarker &m2) {
+        return !(m1 == m2);
+    }
 
 };
 

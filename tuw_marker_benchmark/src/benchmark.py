@@ -43,7 +43,7 @@ class Benchmark:
         kdtree = self.create_kdtree(bmap)
         for detected_marker in marker_detection.markers:
             map_marker = self.match_marker(kdtree, bmap, detected_marker)
-            
+
             if map_marker is None:
                 print('Marker could not be matched to any map marker.')
                 return False
