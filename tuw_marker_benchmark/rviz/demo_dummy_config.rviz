@@ -61,8 +61,6 @@ Visualization Manager:
           Value: true
         camera_mount_bar:
           Value: true
-        checkerboard:
-          Value: true
         ellipses_node/t0-0:
           Value: true
         marker_anchor:
@@ -81,6 +79,8 @@ Visualization Manager:
           Value: true
         t0:
           Value: false
+        t?:
+          Value: true
       Marker Scale: 0.5
       Name: TF
       Show Arrows: true
@@ -90,11 +90,11 @@ Visualization Manager:
         odom:
           base_link:
             camera:
-              checkerboard:
-                {}
               ellipses_node/t0-0:
                 {}
               t0:
+                {}
+              t?:
                 {}
             camera_mount_bar:
               {}
@@ -157,7 +157,7 @@ Visualization Manager:
     - Class: marker_rviz_plugin/MarkerDetection
       Color Label: 170; 170; 170
       Enabled: true
-      Marker Size: 0.300000012
+      Marker Size: 0.100000001
       Name: MarkerDetection
       Show Axes: true
       Show Label: true
