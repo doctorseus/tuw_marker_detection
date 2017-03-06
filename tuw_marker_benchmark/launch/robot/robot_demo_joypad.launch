@@ -1,0 +1,5 @@
+<launch>
+    <include file="$(find tuw_p3dx)/launch/aria.launch" />
+
+    <include file="$(find tuw_marker_benchmark)/launch/robot/robot_inc_tf_robot.launch" />
+</launch>
