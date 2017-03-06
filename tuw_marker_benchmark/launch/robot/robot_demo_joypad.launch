@@ -13,19 +13,26 @@
         
     <include file="$(find tuw_marker_benchmark)/launch/robot/robot_inc_tf_robot.launch" />
     
-    <node name="tuw_checkerboard_node" pkg="tuw_checkerboard" type="tuw_checkerboard_node" output="screen">
-        
-        <param name="checkerboard_columns" value="9" />
-        <param name="checkerboard_rows" value="6" />
-        <param name="checkerboard_square_size" value="0.0365" />
-        <param name="checkerboard_min_square_size" value="5" />
+    <include file="$(find tuw_marker_benchmark)/launch/robot/robot_inc_tf_markers.launch" />    
+    
+    
+    <!-- ArUco -->
+    <node pkg="tuw_aruco" type="aruco_node" name="arMarkerAruco">
+        <param name="show_debug_image" value="false"/>
 
-        <param name="adaptive_thresh" value="True" />
-        <param name="normalize_image" value="True" />
-        <param name="filter_quads" value="False" />
-        <param name="fast_check" value="True" />
+        <param name="marker_size" value="0.10"/>
+        <param name="pose_estimation_enabled" value="false"/>
+        <param name="publish_markers" value="false"/>
+        <param name="publish_fiducials" value="true"/>
 
-        <remap from="image" to="/camera/image_raw"/>
-        <remap from="camera" to="/camera"/>
+        <remap from="image" to="/camera/image_raw" />
+        <remap from="camera_info" to="/camera/camera_info"/>
+        <remap from="markers" to="/markersAruco"/>
+        <remap from="fiducials" to="/fiducialsAruco"/>
+    </node>
+
+    <node pkg="tuw_marker_pose_estimation" type="pose_estimation_node" name="arPoseEstimationAruco">
+        <remap from="fiducials" to="/fiducialsAruco"/>
+        <remap from="markers" to="/markerDetectionAruco"/>
     </node>
 </launch>

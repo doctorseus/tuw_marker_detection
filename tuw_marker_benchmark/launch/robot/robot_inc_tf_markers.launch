@@ -1,0 +1,21 @@
+<launch>
+
+    <node pkg="tf" type="static_transform_publisher" name="marker_base" args="0.70 -0.1875 0 0 0 0 map marker_base 100" />
+
+	<arg name="anchor_height" default="0.358" />
+    <node pkg="tf" type="static_transform_publisher" name="marker_anchor" args="0 0 $(arg anchor_height) 0.78539 0 0 marker_base marker_anchor 100" />
+
+    <node pkg="tf" type="static_transform_publisher" name="marker_aruco" args="0 0.06 0.06 -1.57079 0 1.57079 marker_anchor marker_aruco 100" />
+    <node pkg="tf" type="static_transform_publisher" name="marker_ellipse" args="0 -0.06 0.06 -1.57079 0 1.57079 marker_anchor marker_ellipse 100" />
+    <node pkg="tf" type="static_transform_publisher" name="marker_dice" args="0 0.06 -0.06 -1.57079 0 1.57079 marker_anchor marker_dice 100" />
+    <node pkg="tf" type="static_transform_publisher" name="marker_checkerboard" args="0 -0.06 -0.06 -1.57079 0 1.57079 marker_anchor marker_checkerboard 100" />
+
+    <!-- Republish marker TFs as marker map -->
+    <node pkg="tuw_marker_benchmark" type="tf_to_marker_map_node.py" name="tf_to_marker_map_node" output="screen">
+        <param name="tf_list" value="marker_aruco, marker_ellipse, marker_dice, marker_checkerboard"/>
+        <param name="tf_frame_id" value="map"/>
+        <remap from="map" to="/markerMap" />
+    </node>
+
+</launch>
+
