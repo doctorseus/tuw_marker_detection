@@ -1,5 +1,31 @@
 <launch>
-    <include file="$(find tuw_p3dx)/launch/aria.launch" />
+    <include file="$(find tuw_p3dx)/launch/aria.launch">
+		<arg name="joypad" default="true" />
+    </include>
+    
+    <include file="$(find tuw_p3dx)/launch/laser_hokuyo.launch" />
 
+    <include file="$(find tuw_p3dx)/launch/map_server.launch">
+		<arg name="room" default="roblab_corridor" />
+    </include>
+    
+    <include file="$(find tuw_p3dx)/launch/amcl.launch" />    
+        
     <include file="$(find tuw_marker_benchmark)/launch/robot/robot_inc_tf_robot.launch" />
+    
+    <node name="tuw_checkerboard_node" pkg="tuw_checkerboard" type="tuw_checkerboard_node" output="screen">
+        
+        <param name="checkerboard_columns" value="9" />
+        <param name="checkerboard_rows" value="6" />
+        <param name="checkerboard_square_size" value="0.0365" />
+        <param name="checkerboard_min_square_size" value="5" />
+
+        <param name="adaptive_thresh" value="True" />
+        <param name="normalize_image" value="True" />
+        <param name="filter_quads" value="False" />
+        <param name="fast_check" value="True" />
+
+        <remap from="image" to="/camera/image_raw"/>
+        <remap from="camera" to="/camera"/>
+    </node>
 </launch>

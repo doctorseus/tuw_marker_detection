@@ -1,0 +1,48 @@
+<launch>
+
+    <!-- Camera -->
+    <include file="$(find tuw_marker_benchmark)/launch/inc_robot_camera.launch" />
+
+    <node pkg="tf" type="static_transform_publisher" name="base_link_broadcaster" args="0 0 0 0 0 0 1 odom base_link 100" />
+
+
+    <!--
+        x=1.252m
+        y=0
+
+        checkerboard offset 
+        x=0.0465
+        y=0.146
+
+        result=1.252+0.0465
+
+        1.187 total laser measurement
+    -->
+    <node pkg="tf" type="static_transform_publisher" name="checkerboard_broadcaster" args="1.187 -0.146 0 0 0 0 odom checkerboard_static 100" />
+    <node pkg="tf" type="static_transform_publisher" name="camera_mount_bar_broadcaster" args="0 0 0.615 0 0 0 1 base_link camera_mount_bar 100" />
+
+    <node name="tuw_checkerboard_node" pkg="tuw_checkerboard" type="tuw_checkerboard_node" output="screen">
+        <param name="checkerboard_columns" value="9" />
+        <param name="checkerboard_rows" value="6" />
+        <param name="checkerboard_square_size" value="0.0365" />
+        <param name="checkerboard_min_square_size" value="5" />
+
+        <param name="adaptive_thresh" value="True" />
+        <param name="normalize_image" value="True" />
+        <param name="filter_quads" value="False" />
+        <param name="fast_check" value="True" />
+
+        <remap from="image" to="/camera/image_raw"/>
+        <remap from="camera" to="/camera"/>
+    </node>
+
+    <node pkg="tf" type="static_transform_publisher" name="checkerboard_inv_broadcaster" args="0 0 0 0 0 0 1 checkerboard_static checkerboard_inv 100" />
+    <node pkg="tuw_marker_benchmark" type="tf_inv_node.py" name="tf_inv_node" output="screen" />
+
+    <node pkg="tuw_marker_benchmark" type="tf_lookup_node.py" name="tf_lookup_node" output="screen" />
+
+    <!-- RViz -->
+    <node name="rviz" pkg="rviz" type="rviz" args="-d  $(find tuw_marker_benchmark)/rviz/calibration_tf_config.rviz" />
+
+</launch>
+

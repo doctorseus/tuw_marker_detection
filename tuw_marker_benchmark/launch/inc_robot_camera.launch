@@ -1,5 +1,5 @@
 <launch>
-    <arg name="device" default="1" />
+    <arg name="device" default="0" />
     <arg name="show" default="false" />
 
     <node pkg="tuw_uvc" type="logitech_node" name="camera" output="screen">
