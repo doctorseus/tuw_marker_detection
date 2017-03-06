@@ -1,0 +1,30 @@
+<launch>
+    <!-- Checkerboard -->
+    <node pkg="tuw_checkerboard" type="tuw_checkerboard_node" name="tuw_checkerboard_node" output="screen" >
+        <param name="show_camera_image" value="false"/>
+        <param name="plubish_tf" value="False" />
+        <param name="plubish_marker" value="False" />
+        <param name="publish_fiducials" value="True" />
+        <param name="publish_pose" value="False" />
+
+        <param name="checkerboard_columns" value="3" />
+        <param name="checkerboard_rows" value="3" />
+        <param name="checkerboard_square_size" value="0.0275" />
+        <param name="checkerboard_min_square_size" value="5" />
+
+        <param name="adaptive_thresh" value="True" />
+        <param name="normalize_image" value="True" />
+        <param name="filter_quads" value="False" />
+        <param name="fast_check" value="True" />
+
+        <remap from="image" to="camera/image_raw_uncompressed"/>
+        <remap from="camera" to="/camera"/>
+        <remap from="fiducials" to="/fiducialsCheckerboard"/>
+    </node>
+
+    <node pkg="tuw_marker_pose_estimation" type="pose_estimation_node" name="arPoseEstimationCheckerboard" output="screen">
+        <remap from="fiducials" to="/fiducialsCheckerboard"/>
+        <remap from="markers" to="/markerDetection"/>
+    </node>
+</launch>
+
