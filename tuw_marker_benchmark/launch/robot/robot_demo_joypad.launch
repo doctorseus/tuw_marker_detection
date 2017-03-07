@@ -6,7 +6,7 @@
     <include file="$(find tuw_p3dx)/launch/laser_hokuyo.launch" />
 
     <include file="$(find tuw_p3dx)/launch/map_server.launch">
-		<arg name="room" default="roblab_corridor" />
+		<arg name="room" default="roblab_corridor_marker2" />
     </include>
     
     <include file="$(find tuw_p3dx)/launch/amcl.launch" />    
