@@ -1,0 +1,19 @@
+<launch>
+    <arg name="bag_file" default="robot_test2.bag"/>
+
+    <arg name="type" default="aruco" />
+    <arg name="rate" default="1.0" />
+
+    <include file="$(find tuw_marker_benchmark)/launch/robot/bag/robot_inc_bag.launch">
+        <arg name="bag" default="$(arg bag_file)" />
+        <arg name="rate" default="$(arg rate)" />
+    </include>
+
+    <!--
+    <include file="$(find tuw_marker_benchmark)/launch/robot/bag/robot_inc_marker_$(arg type).launch" />
+    <include file="$(find tuw_marker_benchmark)/launch/robot/bag/robot_inc_benchmark.launch">
+        <arg name="output_directory" default="$(arg type)/$(arg bag_file)" />
+    </include>
+    -->
+</launch>
+

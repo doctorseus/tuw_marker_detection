@@ -39,7 +39,10 @@
     <node pkg="tf" type="static_transform_publisher" name="checkerboard_inv_broadcaster" args="0 0 0 0 0 0 1 checkerboard_static checkerboard_inv 100" />
     <node pkg="tuw_marker_benchmark" type="tf_inv_node.py" name="tf_inv_node" output="screen" />
 
-    <node pkg="tuw_marker_benchmark" type="tf_lookup_node.py" name="tf_lookup_node" output="screen" />
+    <node pkg="tuw_marker_benchmark" type="tf_lookup_node.py" name="tf_lookup_node" output="screen">
+        <param name="tf_target_frame" value="base_link"/>
+        <param name="tf_source_frame" value="camera_inv"/>
+    </node>
 
     <!-- RViz -->
     <node name="rviz" pkg="rviz" type="rviz" args="-d  $(find tuw_marker_benchmark)/rviz/calibration_tf_config.rviz" />

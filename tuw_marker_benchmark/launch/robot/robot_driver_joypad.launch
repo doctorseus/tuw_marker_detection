@@ -1,0 +1,10 @@
+<launch>
+    <include file="$(find tuw_p3dx)/launch/aria.launch">
+		<arg name="joypad" default="true" />
+    </include>
+    
+    <include file="$(find tuw_p3dx)/launch/laser_hokuyo.launch" />
+
+    <!-- reconfigure Laser -->
+    <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure">
+</launch>

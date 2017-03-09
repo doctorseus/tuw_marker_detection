@@ -1,0 +1,22 @@
+<launch>
+    <!-- ArUco -->
+    <node pkg="tuw_aruco" type="aruco_node" name="arMarkerAruco">
+        <param name="show_debug_image" value="false"/>
+
+        <param name="marker_size" value="0.10"/>
+        <param name="pose_estimation_enabled" value="false"/>
+        <param name="publish_markers" value="false"/>
+        <param name="publish_fiducials" value="true"/>
+
+        <remap from="image" to="/camera/image_raw_uncompressed" />
+        <remap from="camera_info" to="/camera/camera_info"/>
+        <remap from="markers" to="/markersAruco"/>
+        <remap from="fiducials" to="/fiducialsAruco"/>
+    </node>
+
+    <node pkg="tuw_marker_pose_estimation" type="pose_estimation_node" name="arPoseEstimationAruco">
+        <remap from="fiducials" to="/fiducialsAruco"/>
+        <remap from="markers" to="/markerDetection"/>
+    </node>
+</launch>
+

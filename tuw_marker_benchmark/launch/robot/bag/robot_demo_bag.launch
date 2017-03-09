@@ -1,0 +1,14 @@
+<launch>
+    <arg name="bag_file" default="robot_test2.bag"/>
+    <arg name="type" default="aruco" />
+
+    <!-- Play bag -->
+    <param name="use_sim_time" value="true"/>
+    <node pkg="rosbag" type="play" name="player" args="--loop --clock --rate 1.0 $(find tuw_marker_benchmark)/bags/robot/$(arg bag_file)" output="screen"/>
+
+    <!-- Uncompress video -->
+    <node name="republish" type="republish" pkg="image_transport" args="compressed in:=/camera/image_raw raw out:=/camera/image_raw_uncompressed" />
+
+    <include file="$(find tuw_marker_benchmark)/launch/robot/bag/robot_inc_marker_$(arg type).launch" />
+</launch>
+
