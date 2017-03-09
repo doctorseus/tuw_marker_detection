@@ -1,0 +1,31 @@
+<launch>
+    <arg name="robot_name" default="p3dx" />
+    <arg name="scan" default="laser_front/scan" /> <!-- former "front_laser" -->
+    <arg name="cfg" default="default" />
+    <arg name="tf_broadcast" default="true" />
+
+    <group ns="$(arg robot_name)">
+        <node pkg="amcl" type="amcl" name="amcl" output="screen">
+
+            <param name="update_min_d" value="0.02"/>
+            <param name="update_min_a" value="0.08"/>
+            <!--
+            <param name="update_min_d" value="0.05"/>
+            <param name="update_min_a" value="0.1"/>
+            -->
+            <remap from="scan" to="$(arg scan)"/>
+            <remap from="map" to="/map"/>
+            <remap from="static_map" to="/static_map"/>
+            <remap from="amcl_pose" to="pose"/>
+            <remap from="initialpose" to="amcl/initialpose"/>
+            <rosparam file="$(find tuw_p3dx)/cfg/amcl/$(arg cfg)/amcl_filter.yaml"       command="load"/>
+            <rosparam file="$(find tuw_p3dx)/cfg/amcl/$(arg cfg)/amcl_laser_model.yaml"  command="load"/>
+            <rosparam file="$(find tuw_p3dx)/cfg/amcl/$(arg cfg)/amcl_motion_model.yaml" command="load"/>
+            <param name="odom_frame_id" value="$(arg robot_name)/odom"/>
+            <param name="base_frame_id" value="$(arg robot_name)/base_link"/>
+            <param name="global_frame_id" value="/map"/>
+            <param name="tf_broadcast" value="$(arg tf_broadcast)"/>
+        </node>
+    </group>
+</launch>
+
