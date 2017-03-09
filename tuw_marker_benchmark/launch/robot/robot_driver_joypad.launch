@@ -6,5 +6,8 @@
     <include file="$(find tuw_p3dx)/launch/laser_hokuyo.launch" />
 
     <!-- reconfigure Laser -->
-    <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure">
+    <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure" />
+
+    <!-- camera and tfs -->
+    <include file="$(find tuw_marker_benchmark)/launch/robot/robot_inc_tf_robot.launch" />
 </launch>
