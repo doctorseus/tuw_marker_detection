@@ -128,7 +128,7 @@ class DataCollectorNode:
 
         try:
             # Get camera absolute position
-            camera_tf = self.tfb.lookup_transform(self.config.tf_odom, self.config.tf_camera, msg.header.stamp)
+            camera_tf = self.tfb.lookup_transform(self.config.tf_odom, self.config.tf_camera, msg.header.stamp, timeout=rospy.Duration(0.2))
             camera_pose = BPose.from_Transform_msg(camera_tf)
 
             # Marker are detected relative to camera position. Convert positions to absolute values.

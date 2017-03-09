@@ -15,7 +15,8 @@ class SamplePair:
 if __name__ == '__main__':
     samples = []
 
-    sample_directory_paths = sys.argv[1:]
+    name = sys.argv[1]
+    sample_directory_paths = sys.argv[2:]
     sample_paths = map(lambda directory_path: (os.path.join(directory_path, 'map.json'), os.path.join(directory_path, 'marker_detections.json')), sample_directory_paths)
 
     for (map_path, detections_path) in sample_paths:
@@ -35,6 +36,6 @@ if __name__ == '__main__':
 
     print('Total samples found: %d' % len(samples))
 
-    benchmark = StaticBenchmark(samples)
+    benchmark = StaticBenchmark(name, samples)
     benchmark.run()
     benchmark.store_results()

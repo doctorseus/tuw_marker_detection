@@ -1,6 +1,7 @@
 class Benchmark:
 
-    def __init__(self, samples):
+    def __init__(self, name, samples):
+        self.name = name
         self.samples = samples
 
     def run(self):
